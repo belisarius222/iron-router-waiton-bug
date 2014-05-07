@@ -10,13 +10,27 @@ if (Meteor.isClient) {
     this.route('helloWidget', {
       path: '/widget',
       waitOn: function() {
-        return [ Meteor.subscribe('widgets') ];
+        return [
+          Meteor.subscribe('widgets', function() {
+            console.log('Susbcription ready.');
+          })
+        ];
       }
     });
   });
 
   Template.helloWidget.widget = function () {
+    if (! Widgets.findOne()) {
+      console.log('No widgets found!');
+      return 'No widgets found.';
+    }
+
+    // Without checking for the presence of a widget, this throws an error.
     return Widgets.findOne().label;
+  };
+
+  Template.helloWidget.rendered = function() {
+    console.log('Widgets.find().count() in rendered: '+Widgets.find().count());
   };
 }
 
